@@ -6,7 +6,7 @@ let pool = mysql.createPool({
     host: "localhost",
     port: "3306",
     user: "root",
-    password: "",
+    password: "root",
     database: "chatroom_db",
     connectionLimit: 100  //连接池大小限制
 })
@@ -25,7 +25,7 @@ console.log('脚本执行完毕')
 let express = require('express')
 let server = express()
 let session = require('express-session')
-let port = 5050
+let port = 63342
 server.listen(port, () => {
     console.log("服务器启动成功！正在监听端口：", port)
 })
@@ -98,14 +98,14 @@ server.use((req,res,next)=>{
     if(req.url=='/user/login' || req.url=='/user/register' || req.session.user){
         next()
     } else {
-        res.redirect(302,'http://127.0.0.1:5500/frontend/login.html')
+        res.redirect(302,'http://localhost:63342/ChattingRoom/frontend/login.html')
         return
     }
 })
 
 //自定义中间件：允许指定客户端的跨域访问
 server.use((req, res, next) => {
-    res.set('Access-Control-Allow-Origin', 'http://127.0.0.1:5500')  //当前服务器允许来自任何客户端的访问
+    res.set('Access-Control-Allow-Origin', 'http://localhost:63342')  //当前服务器允许来自任何客户端的访问
     res.set("Access-Control-Allow-Credentials",'true');
     res.set("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
     res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
