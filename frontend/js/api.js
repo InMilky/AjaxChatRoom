@@ -1,5 +1,3 @@
-const API_BASE_URL = "http://127.0.0.1:5050";
-
 $.ajaxSetup({
   xhrFields: { withCredentials: true },
   dataType: "json",
@@ -10,10 +8,16 @@ function apiURL(path) {
 }
 
 function apiRequest(method, path, data) {
+  const token = sessionStorage.getItem("token");
   return $.ajax({
     method: method,
     url: apiURL(path),
     data: data,
+    beforeSend(xhr) {
+      if (token) {
+        xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      }
+    },
   });
 }
 

@@ -124,6 +124,7 @@
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
+    <script src="js/config.js"></script>
     <script src="js/modal.js"></script>
     <script src="js/api.js"></script>
     <script src="js/base.js"></script>
@@ -136,27 +137,40 @@
         if (user1 == null) {
           showErrorModal("请先登录!");
           window.location.href = "login.html";
+          return;
         }
-        id = getQueryString("id");
-        id = Number(id);
-        if (id == null || id == "" || id == NaN) {
-          showErrorModal("请选择私聊对象!");
-          window.location.href = "room.html";
-        }
-        $("#navUsername").html(`${user1.nickname}<span class="caret"></span>`);
-        getInfo();
-        updatePrivate();
-        setInterval(updatePrivate, 1000);
+        API.isLogin()
+          .done((data) => {
+            if (data.code !== 200) {
+              showErrorModal("登录已失效，请重新登录");
+              window.location.href = "login.html";
+              return;
+            }
+            id = getQueryString("id");
+            id = Number(id);
+            if (!id || Number.isNaN(id)) {
+              showErrorModal("请选择私聊对象!");
+              window.location.href = "room.html";
+              return;
+            }
+            $("#navUsername").html(
+              `${escapeHtml(user1.nickname)}<span class="caret"></span>`,
+            );
+            getInfo();
+            updatePrivate();
+            setInterval(updatePrivate, 1000);
+          })
+          .fail(handleAjaxError);
       });
 
       function getInfo() {
         API.getInfo(id)
           .done((data) => {
             user2 = data.info;
-            $("#nickname").html(`${user2.nickname}`);
-            $("#sex").html(`性别：${user2.sex}`);
-            $("#age").html(`年龄：${user2.age}`);
-            $("#hobby").html(`兴趣：${user2.hobby}`);
+            $("#nickname").text(user2.nickname);
+            $("#sex").text(`性别：${user2.sex}`);
+            $("#age").text(`年龄：${user2.age}`);
+            $("#hobby").text(`兴趣：${user2.hobby}`);
           })
           .fail(handleAjaxError);
       }

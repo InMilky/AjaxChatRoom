@@ -28,7 +28,7 @@ function showMessageModal(message, title = "提示", onClose) {
   ensureCommonModal();
   const $modal = $(`#${MESSAGE_MODAL_ID}`);
   $modal.find(".modal-title").text(title);
-  $modal.find(".modal-body p").html(message);
+  $modal.find(".modal-body p").text(message);
   $modal.off("hidden.bs.modal");
   if (typeof onClose === "function") {
     $modal.on("hidden.bs.modal", function () {

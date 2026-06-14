@@ -41,6 +41,16 @@ function logout() {
     })
     .fail(handleAjaxError);
   sessionStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function updateOnline() {
@@ -48,7 +58,7 @@ function updateOnline() {
     .done((data) => {
       let html = '<a href="#" class="list-group-item active">在线用户列表</a>';
       for (let each of data) {
-        html += `<a href="private.html?id=${each.id}" class="list-group-item">${each.nickname}</a>`;
+        html += `<a href="private.html?id=${encodeURIComponent(each.id)}" class="list-group-item">${escapeHtml(each.nickname)}</a>`;
       }
       $("#onlineList").html(html);
     })
@@ -62,8 +72,8 @@ function updatePublic() {
       for (let each of data) {
         html += `<div class="media">
                     <div class="media-body">
-                        <h5 class="media-heading"><b>【${each.nickname}】&nbsp&nbsp${new Date(each.time).Format("yyyy年MM月dd日 hh:mm:ss")}</b></h5>
-                        <h5>${each.content}</h5>
+                        <h5 class="media-heading"><b>【${escapeHtml(each.nickname)}】&nbsp&nbsp${new Date(each.time).Format("yyyy年MM月dd日 hh:mm:ss")}</b></h5>
+                        <h5>${escapeHtml(each.content)}</h5>
                     </div>
                 </div>`;
       }
@@ -84,8 +94,8 @@ function updatePrivate() {
         for (let each of data.result) {
           html += `<div class="media">
                         <div class="media-body">
-                            <h5 class="media-heading"><b>【${each.ufrom == user1.id ? user1.nickname : user2.nickname}】&nbsp&nbsp${new Date(each.time).Format("yyyy年MM月dd日 hh:mm:ss")}</b></h5>
-                            <h5>${each.content}</h5>
+                            <h5 class="media-heading"><b>【${escapeHtml(each.ufrom == user1.id ? user1.nickname : user2.nickname)}】&nbsp&nbsp${new Date(each.time).Format("yyyy年MM月dd日 hh:mm:ss")}</b></h5>
+                            <h5>${escapeHtml(each.content)}</h5>
                         </div>
                     </div>`;
         }

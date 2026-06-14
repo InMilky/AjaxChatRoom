@@ -98,6 +98,7 @@
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
+    <script src="js/config.js"></script>
     <script src="js/modal.js"></script>
     <script src="js/api.js"></script>
 
@@ -119,6 +120,9 @@
           .done((data) => {
             if (data.code === 200) {
               sessionStorage.setItem("user", JSON.stringify(data.user));
+              if (data.token) {
+                sessionStorage.setItem("token", data.token);
+              }
               window.location.href = "room.html";
             } else {
               showErrorModal(data.msg);

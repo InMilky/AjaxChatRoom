@@ -125,6 +125,7 @@
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
+    <script src="js/config.js"></script>
     <script src="js/modal.js"></script>
     <script src="js/api.js"></script>
     <script src="js/base.js"></script>
@@ -134,12 +135,24 @@
         if (user == null) {
           showErrorModal("请先登录!");
           window.location.href = "login.html";
+          return;
         }
-        $("#navUsername").html(`${user.nickname}<span class="caret"></span>`);
-        updatePublic();
-        updateOnline();
-        setInterval(updatePublic, 1000);
-        setInterval(updateOnline, 1000 * 10);
+        API.isLogin()
+          .done((data) => {
+            if (data.code !== 200) {
+              showErrorModal("登录已失效，请重新登录");
+              window.location.href = "login.html";
+              return;
+            }
+            $("#navUsername").html(
+              `${escapeHtml(user.nickname)}<span class="caret"></span>`,
+            );
+            updatePublic();
+            updateOnline();
+            setInterval(updatePublic, 1000);
+            setInterval(updateOnline, 1000 * 10);
+          })
+          .fail(handleAjaxError);
       });
 
       $("#btSend").click(() => {
