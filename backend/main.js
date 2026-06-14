@@ -23,6 +23,8 @@ console.log('脚本执行完毕')
 
 //导入第三方模块：express，创建基于node.js的web服务器
 let express = require("express");
+let bcrypt = require("bcryptjs");
+let crypto = require("crypto");
 let server = express();
 let session = require("express-session");
 let port = 5050;
@@ -37,6 +39,55 @@ server.listen(port, () => {
 //服务器数据
 let online = [];
 let onlineTTL = 1000 * 60 * 10;
+let tokenSessions = {};
+
+function getTokenFromRequest(req) {
+  const auth = req.headers.authorization || req.headers["x-session-token"];
+  if (!auth) {
+    return null;
+  }
+  if (auth.startsWith("Bearer ")) {
+    return auth.slice(7).trim();
+  }
+  return auth.trim();
+}
+
+function createSessionToken(user) {
+  const token = crypto.randomBytes(32).toString("hex");
+  tokenSessions[token] = {
+    user,
+    loginTime: Date.now(),
+    updatedAt: Date.now(),
+  };
+  return token;
+}
+
+function getAuthenticatedUser(req) {
+  const token = getTokenFromRequest(req);
+  if (token) {
+    const session = tokenSessions[token];
+    if (session) {
+      session.updatedAt = Date.now();
+      req.token = token;
+      return session.user;
+    }
+  }
+
+  if (req.session && req.session.user) {
+    return req.session.user;
+  }
+
+  return null;
+}
+
+function cleanupExpiredTokenSessions() {
+  const now = Date.now();
+  for (const token in tokenSessions) {
+    if (tokenSessions[token].updatedAt + onlineTTL <= now) {
+      delete tokenSessions[token];
+    }
+  }
+}
 
 //定时器清除非活跃用户
 let schedule = require("node-schedule");
@@ -48,6 +99,7 @@ schedule.scheduleJob("0 * * * * *", () => {
       i--;
     }
   }
+  cleanupExpiredTokenSessions();
 });
 
 function addOnline(user) {
@@ -77,6 +129,7 @@ function removeOnline(userid) {
 /*********************后台API****************** */
 /********************************************** */
 //使用Express提供的中间件：处理POST请求中的主体数据，保存在req.body属性中
+server.use(express.json());
 //处理application/x-www-form-urlencoded类型的请求数据
 server.use(
   express.urlencoded({
@@ -90,10 +143,12 @@ server.use(
   session({
     name: "ChatRoom",
     secret: "ajax chat room secret",
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
-      secure: false,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: onlineTTL,
     },
   }),
@@ -101,29 +156,44 @@ server.use(
 
 //登录拦截器
 server.use((req, res, next) => {
+  const allowedPaths = ["/user/login", "/user/register", "/user/isLogin"];
+  if (allowedPaths.includes(req.path)) {
+    return next();
+  }
+
+  if (getAuthenticatedUser(req)) {
+    return next();
+  }
+
   if (
-    req.url == "/user/login" ||
-    req.url == "/user/register" ||
-    req.session.user
+    req.path.startsWith("/user/") ||
+    req.path.startsWith("/public/") ||
+    req.path.startsWith("/private/")
   ) {
-    next();
-  } else {
-    res.redirect(
-      302,
-      "http://localhost:63342/ChattingRoom/frontend/login.html",
-    );
+    res.status(401).json({ code: 401, msg: "未登录或登录已过期" });
     return;
   }
+
+  next();
 });
 
 //自定义中间件：允许指定客户端的跨域访问
 server.use((req, res, next) => {
-  res.set("Access-Control-Allow-Origin", "http://127.0.0.1:63342");
+  const allowedOrigins = [
+    "http://127.0.0.1:63342",
+    "http://localhost:63342",
+    "http://127.0.0.1:5050",
+    "http://localhost:5050",
+  ];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin) || origin === "null") {
+    res.set("Access-Control-Allow-Origin", origin);
+  }
   res.set("Access-Control-Allow-Credentials", "true");
   res.set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
   res.set(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Session-Token",
   );
   next(); //放行，让后续的请求处理方法继续处理
 });
@@ -175,18 +245,21 @@ server.post("/user/register", (req, res) => {
       res.json({ code: 500, msg: "用户名已经存在！" });
       return;
     }
-    //执行数据库操作-INSERT
-    sql =
-      "INSERT INTO cr_user(username,nickname,password,sex,age,hobby) VALUES (?,?,?,?,?,?)";
-    pool.query(
-      sql,
-      [username, nickname, password, sex, age, hobby],
-      (err, result) => {
-        if (err) throw err;
-        res.json({ code: 200, msg: "注册成功!", id: result.insertId });
-        console.log(`${username} 注册成功！`);
-      },
-    );
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) throw err;
+      //执行数据库操作-INSERT
+      sql =
+        "INSERT INTO cr_user(username,nickname,password,sex,age,hobby) VALUES (?,?,?,?,?,?)";
+      pool.query(
+        sql,
+        [username, nickname, hashedPassword, sex, age, hobby],
+        (err, result) => {
+          if (err) throw err;
+          res.json({ code: 200, msg: "注册成功!", id: result.insertId });
+          console.log(`${username} 注册成功！`);
+        },
+      );
+    });
   });
 });
 
@@ -203,27 +276,73 @@ server.post("/user/login", (req, res) => {
     return;
   }
 
-  let sql = "SELECT * FROM cr_user WHERE username=? AND password=?";
-  pool.query(sql, [username, password], (err, result) => {
+  let sql =
+    "SELECT id, username, nickname, password, sex, age, hobby FROM cr_user WHERE username=?";
+  pool.query(sql, [username], (err, result) => {
     if (err) throw err;
-    if (result.length > 0) {
-      req.session.user = result[0];
-      req.session.loginTime = Date.now();
-      addOnline(result[0]);
-      res.json({ code: 200, msg: "登录成功！", user: result[0] });
-      return;
-    } else {
+    if (result.length === 0) {
       res.json({ code: 400, msg: "用户名或密码错误！" });
       return;
     }
+
+    const dbUser = result[0];
+    const storedPassword = dbUser.password;
+    const user = {
+      id: dbUser.id,
+      username: dbUser.username,
+      nickname: dbUser.nickname,
+      sex: dbUser.sex,
+      age: dbUser.age,
+      hobby: dbUser.hobby,
+    };
+
+    bcrypt.compare(password, storedPassword, (err, same) => {
+      if (err) throw err;
+      if (same) {
+        req.session.user = user;
+        req.session.loginTime = Date.now();
+        addOnline(user);
+        const token = createSessionToken(user);
+        res.json({ code: 200, msg: "登录成功！", user: user, token });
+      } else {
+        // 兼容旧明文密码数据
+        if (password === storedPassword) {
+          bcrypt.hash(password, 10, (err, hashedPassword) => {
+            if (err) throw err;
+            let updateSql = "UPDATE cr_user SET password=? WHERE id=?";
+            pool.query(updateSql, [hashedPassword, dbUser.id], (err) => {
+              if (err) throw err;
+              req.session.user = user;
+              req.session.loginTime = Date.now();
+              addOnline(user);
+              const token = createSessionToken(user);
+              res.json({ code: 200, msg: "登录成功！", user: user, token });
+            });
+          });
+        } else {
+          res.json({ code: 400, msg: "用户名或密码错误！" });
+        }
+      }
+    });
   });
 });
 
 server.get("/user/logout", (req, res) => {
-  if (req.session.user) {
-    let userid = req.session.user.id;
-    removeOnline(userid);
-    req.session.destroy();
+  const user = getAuthenticatedUser(req);
+  if (user) {
+    removeOnline(user.id);
+  }
+  const token = getTokenFromRequest(req);
+  if (token && tokenSessions[token]) {
+    delete tokenSessions[token];
+  }
+  if (
+    req.session &&
+    req.session.user &&
+    user &&
+    req.session.user.id === user.id
+  ) {
+    req.session.destroy(() => {});
   }
   res.json({ code: 200, msg: "注销成功！" });
 });
@@ -233,7 +352,7 @@ server.get("/user/online", (req, res) => {
 });
 
 server.get("/user/isLogin", (req, res) => {
-  if (res.session.user) {
+  if (getAuthenticatedUser(req)) {
     res.json({ code: 200, msg: "用户已登录！" });
   } else {
     res.json({ code: 400, msg: "用户未登录！" });
@@ -241,14 +360,15 @@ server.get("/user/isLogin", (req, res) => {
 });
 
 server.get("/user/getInfo", (req, res) => {
-  let id = req.query.id;
+  const id = Number(req.query.id);
 
-  if (id == undefined || id == null) {
-    res.json({ code: 400, msg: "请求有误，id为空！" });
+  if (!id || Number.isNaN(id)) {
+    res.json({ code: 400, msg: "请求有误，id无效！" });
     return;
   }
 
-  let sql = "SELECT * FROM cr_user WHERE id=?";
+  let sql =
+    "SELECT id, username, nickname, sex, age, hobby FROM cr_user WHERE id=?";
   pool.query(sql, [id], (err, result) => {
     if (err) throw err;
     if (result.length > 0) {
@@ -262,9 +382,11 @@ server.get("/user/getInfo", (req, res) => {
 });
 
 server.get("/public/getAll", (req, res) => {
+  const loginTime =
+    req.session && req.session.loginTime ? req.session.loginTime : 0;
   let sql =
     "SELECT cr_public.*, cr_user.nickname FROM cr_public,cr_user WHERE cr_public.userid=cr_user.id AND time >= ? ORDER BY time";
-  pool.query(sql, [req.session.loginTime], (err, result) => {
+  pool.query(sql, [loginTime], (err, result) => {
     if (err) throw err;
     res.json(result);
   });
@@ -301,8 +423,8 @@ server.get("/private/getAll", (req, res) => {
     res.json({ code: 400, msg: "请求有误，id为空！" });
     return;
   }
-  if (uid2 == NaN) {
-    res.json({ code: 401, msg: "请求有误！" });
+  if (Number.isNaN(uid2) || uid2 <= 0) {
+    res.json({ code: 401, msg: "请求有误，id无效！" });
     return;
   }
 
@@ -325,8 +447,8 @@ server.post("/private/send", (req, res) => {
     res.json({ code: 400, msg: "不能发空信息！" });
     return;
   }
-  if (uto == NaN) {
-    res.json({ code: 401, msg: "请求有误！" });
+  if (Number.isNaN(uto) || uto <= 0) {
+    res.json({ code: 401, msg: "请求有误，目标用户 ID 无效！" });
     return;
   }
 
