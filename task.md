@@ -40,15 +40,15 @@
   - 通过 URL 参数/请求头载入不同 session id，或
   - 改造为基于 token 的鉴权（更推荐）
 
-  1.2 若临时测试需求仅为验证多账号并行
+    1.2 若临时测试需求仅为验证多账号并行
 
 - 在文档中明确“同一浏览器单一域名下，session cookie 共享，建议使用不同浏览器或隐身窗口进行测试”
 
   1.3 若要实现同一浏览器跨账号并行
 
-- 将后端登录改造为支持 `Authorization: Bearer <token>` 或自定义 `X-Session-Token`
-- 前端登录时返回 token，后续请求带 token 进行鉴权
-- 后端不再完全依赖默认 cookie session，而是使用 token 绑定用户状态
+- 将后端登录改造为支持 `Authorization: Bearer <token>` 或自定义 `X-Session-Token`（已实现）
+- 前端登录时返回 token，后续请求带 token 进行鉴权（已实现）
+- 后端不再完全依赖默认 cookie session，而是使用 token 绑定用户状态（已实现）
 
 ### 2. 后端修复与优化
 

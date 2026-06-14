@@ -29,10 +29,10 @@
 - [x] 在线用户列表：已实现
 - [x] 用户信息查询：已实现
 - [x] 注销功能：已实现
-- [ ] 密码安全与加密：未实现（明文存储/传输）
-- [ ] 前端输入输出安全：未实现（未做 HTML 转义，可能存在 XSS 风险）
-- [ ] `/user/isLogin` 接口存在逻辑错误：当前未正确检查 `req.session.user`
-- [ ] 部署体验：需要手动调整前端与后端端口、CORS 及静态服务器配置
+- [x] 密码安全与加密：已实现，使用 bcrypt 哈希存储密码
+- [x] 前端输入输出安全：已实现，对消息内容与显示字段进行 HTML 转义
+- [x] `/user/isLogin` 接口逻辑错误：已修复，改为检查 `req.session.user` 或 token 鉴权
+- [x] 部署体验：已改进，前端 AJAX 地址统一到 `frontend/js/config.js`，后端 CORS 支持 `Authorization` 头
 
 **是否实现项目目标**
 
@@ -57,7 +57,7 @@ npm install
 npm start
 ```
 
-默认后端端口在 `backend/main.js` 中为 `63342`（可修改）。前端 AJAX 请求地址在 `frontend/js/base.js` 中使用了 `http://127.0.0.1:5050`，如端口不同请同步修改为后端实际监听端口。
+默认后端端口在 `backend/main.js` 中为 `5050`（可修改）。前端 AJAX 请求地址在 `frontend/js/config.js` 中定义为 `API_BASE_URL`，如端口或后端地址不同请同步修改该配置。
 
 **后端主要接口（摘要）**
 
@@ -80,8 +80,9 @@ npm start
 
 **注意事项**
 
-- 后端使用 session 进行登录拦截，部分接口需要在登录状态下访问。
-- 如需在不同主机/端口部署，注意更新前端 AJAX地址和后端的 CORS 配置（`backend/main.js`）。
+- 后端使用 session 与 token 混合鉴权，当前已支持同一浏览器不同标签页/窗口使用不同用户登录：登录后令牌会保存到当前标签页的 `sessionStorage.token` 中。
+- 若使用同一浏览器内不同账号并行测试，建议在不同标签页/窗口中分别登录，并确保页面持有各自的 token。
+- 如需在不同主机/端口部署，注意更新前端 AJAX 地址（`frontend/js/config.js`）和后端的 CORS 配置（`backend/main.js`）。
 
 **许可证**
 
