@@ -1,135 +1,160 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ajax聊天室-公共聊天</title>
 
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/scaffolding.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet" />
+    <link href="css/scaffolding.css" rel="stylesheet" />
     <style>
-        .mbg {
-            margin: 40px 0;
-            padding: 20px 0;
-            background: rgba(0, 0, 0, 0.3);
-            color: #222222;
-        }
+      .mbg {
+        margin: 40px 0;
+        padding: 20px 0;
+        background: rgba(0, 0, 0, 0.3);
+        color: #222222;
+      }
 
-        .media {
-            background-color: rgba(240, 240, 240, 1);
-            border-radius: 10px;
-            padding: 10px;
-        }
+      .media {
+        background-color: rgba(240, 240, 240, 1);
+        border-radius: 10px;
+        padding: 10px;
+      }
     </style>
     <!--[if lt IE 9]>
-    <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
     <![endif]-->
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="room.html">Ajax聊天室</a>
-                </div>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button
+              type="button"
+              class="navbar-toggle collapsed"
+              data-toggle="collapse"
+              data-target="#bs-example-navbar-collapse-1"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="room.html">Ajax聊天室</a>
+          </div>
 
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav">
-                        <li class="active"><a href="room.html">公屏聊天 <span class="sr-only">(current)</span></a></li>
-                        <li><a href="private.html">私聊</a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a href="#" id="navUsername" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                aria-haspopup="true" aria-expanded="false"></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">添加好友</a></li>
-                                <li><a href="#">个人中心</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a onclick="logout()">注销</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="list-group" id="onlineList" style="height: 640px;overflow-y:scroll;">
-                    <a href="#" class="list-group-item active">在线用户列表</a>
-                </div>
-            </div>
-            <div class="col-md-9">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">公屏聊天</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="well" style="height: 500px;overflow-y:scroll;" id="contentList">
-                            
-                        </div>
-                        <form class="form-inline">
-                            <textarea class="form-control" id="content" style="width: 90%;"></textarea>
-                            <button class="btn btn-primary form-control" type="button" id="btSend" style="width: auto;">发送</button>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
+          <div
+            class="collapse navbar-collapse"
+            id="bs-example-navbar-collapse-1"
+          >
+            <ul class="nav navbar-nav">
+              <li class="active">
+                <a href="room.html"
+                  >公屏聊天 <span class="sr-only">(current)</span></a
+                >
+              </li>
+              <li><a href="private.html">私聊</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a
+                  href="#"
+                  id="navUsername"
+                  class="dropdown-toggle"
+                  data-toggle="dropdown"
+                  role="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                ></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">添加好友</a></li>
+                  <li><a href="#">个人中心</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a onclick="logout()">注销</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
         </div>
+      </nav>
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="list-group"
+            id="onlineList"
+            style="height: 640px; overflow-y: scroll"
+          >
+            <a href="#" class="list-group-item active">在线用户列表</a>
+          </div>
+        </div>
+        <div class="col-md-9">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">公屏聊天</h3>
+            </div>
+            <div class="panel-body">
+              <div
+                class="well"
+                style="height: 500px; overflow-y: scroll"
+                id="contentList"
+              ></div>
+              <form class="form-inline">
+                <textarea
+                  class="form-control"
+                  id="content"
+                  style="width: 90%"
+                ></textarea>
+                <button
+                  class="btn btn-primary form-control"
+                  type="button"
+                  id="btSend"
+                  style="width: auto"
+                >
+                  发送
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/base.js"></script>
     <script>
-        $(window).ready(() => {
-            let user = JSON.parse(sessionStorage.getItem("user"))
-            if (user == null) {
-                alert("请先登录!")
-                window.location.href = "login.html"
+      $(window).ready(() => {
+        let user = JSON.parse(sessionStorage.getItem("user"));
+        if (user == null) {
+          showErrorModal("请先登录!");
+          window.location.href = "login.html";
+        }
+        $("#navUsername").html(`${user.nickname}<span class="caret"></span>`);
+        updatePublic();
+        updateOnline();
+        setInterval(updatePublic, 1000);
+        setInterval(updateOnline, 1000 * 10);
+      });
+
+      $("#btSend").click(() => {
+        let content = $("#content").val();
+        API.publicSend(content)
+          .done((data) => {
+            if (data.code == 200) {
+              $("#content").val("");
+              updatePublic();
+            } else {
+              showErrorModal(data.msg);
             }
-            $('#navUsername').html(`${user.nickname}<span class="caret"></span>`)
-            updatePublic()
-            updateOnline()
-            setInterval(updatePublic,1000)
-            setInterval(updateOnline,1000*10)
-        })
-        
-
-        $('#btSend').click(()=>{
-            let content = $('#content').val()
-            $.ajax({
-                method: 'POST',
-                url: 'http://127.0.0.1:5050/public/send',
-                data: `content=${content}`,
-                xhrFields:{withCredentials:true},
-                success: (data, msg, xhr) => {
-                    if(data.code==200){
-                        $('#content').val('')
-                        updatePublic()
-                    } else {
-                        alert(data.msg)
-                    }
-                },
-                error: (xhr, err) => {
-                    console.log(xhr)
-                    console.log(err)
-                }
-            })
-        })
+          })
+          .fail(handleAjaxError);
+      });
     </script>
-
-</body>
-
+  </body>
 </html>

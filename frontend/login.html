@@ -1,136 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ajax聊天室-登录</title>
 
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/scaffolding.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet" />
+    <link href="css/scaffolding.css" rel="stylesheet" />
     <!--[if lt IE 9]>
-    <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
     <![endif]-->
-</head>
-<body>
-
-<!-- 主体 -->
-<div class="container">
-    <nav class="navbar navbar-default">
+  </head>
+  <body>
+    <!-- 主体 -->
+    <div class="container">
+      <nav class="navbar navbar-default">
         <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="login.html">Ajax聊天室</a>
-            </div>
+          <div class="navbar-header">
+            <button
+              type="button"
+              class="navbar-toggle collapsed"
+              data-toggle="collapse"
+              data-target="#bs-example-navbar-collapse-1"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="login.html">Ajax聊天室</a>
+          </div>
 
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li><a href="login.html">登录 <span class="sr-only">(current)</span></a></li>
-                    <li><a href="register.html">注册</a></li>
-                </ul>
-            </div>
+          <div
+            class="collapse navbar-collapse"
+            id="bs-example-navbar-collapse-1"
+          >
+            <ul class="nav navbar-nav">
+              <li>
+                <a href="login.html"
+                  >登录 <span class="sr-only">(current)</span></a
+                >
+              </li>
+              <li><a href="register.html">注册</a></li>
+            </ul>
+          </div>
         </div>
-    </nav>
-    <div class="row">
+      </nav>
+      <div class="row">
         <div class="col-xs-12 col-md-10 col-md-offset-1">
-            <div class="well">
-                <div class="row text-center">
-                    <h4>登录</h4>
+          <div class="well">
+            <div class="row text-center">
+              <h4>登录</h4>
+            </div>
+            <form class="form-horizontal">
+              <!-- 用户名 -->
+              <div class="form-group">
+                <label for="username" class="col-md-4 control-label"
+                  >用户名：</label
+                >
+                <div class="col-md-4">
+                  <input id="username" type="text" class="form-control" />
                 </div>
-                <form class="form-horizontal">
-                    <!-- 用户名 -->
-                    <div class="form-group">
-                        <label for="username" class="col-md-4 control-label">用户名：</label>
-                        <div class="col-md-4">
-                            <input id="username" type="text" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <span id="usernameMsg" class="help-block"></span>
-                        </div>
-                    </div>
-                    <!-- 密码 -->
-                    <div class="form-group">
-                        <label for="password" class="col-md-4 control-label">密码：</label>
-                        <div class="col-md-4">
-                            <input id="password" type="password" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <span id="passwordMsg" class="help-block"></span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-4 col-md-offset-4">
-                            <button id="btLogin" type="button" class="btn btn-info form-control">登录</button>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
+                <div class="col-md-4">
+                  <span id="usernameMsg" class="help-block"></span>
+                </div>
+              </div>
+              <!-- 密码 -->
+              <div class="form-group">
+                <label for="password" class="col-md-4 control-label"
+                  >密码：</label
+                >
+                <div class="col-md-4">
+                  <input id="password" type="password" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                  <span id="passwordMsg" class="help-block"></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-md-4 col-md-offset-4">
+                  <button
+                    id="btLogin"
+                    type="button"
+                    class="btn btn-info form-control"
+                  >
+                    登录
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/api.js"></script>
 
-<script>
-    $('#btLogin').click(function(){
-        let username = $('#username').val()
-        let password = $('#password').val()
+    <script>
+      $("#btLogin").click(function () {
+        let username = $("#username").val();
+        let password = $("#password").val();
 
-        if(username==null || username.length==""){
-            $('#usernameMsg').html('请填写用户名！').removeClass('alert-info').addClass('alert-danger')
-            return
+        if (!username) {
+          setFieldMessage("#usernameMsg", "请填写用户名！", true);
+          return;
         }
-        if(password==null || password.length==""){
-            $('#usernameMsg').html('请填写密码！').removeClass('alert-info').addClass('alert-danger')
-            return
+        if (!password) {
+          setFieldMessage("#passwordMsg", "请填写密码！", true);
+          return;
         }
 
-        $.ajax({
-            method: 'POST',
-            url: 'http://127.0.0.1:5050/user/login',
-            data: `username=${username}&password=${password}`,
-            xhrFields:{withCredentials:true},
-            success: (data, msg, xhr)=>{
-                if(data.code===200){
-                    sessionStorage.setItem('user',JSON.stringify(data.user))
-                    window.location.href="room.html"
-                } else {
-                    $('#serverErrMsg').html(data.msg)
-                    $('#modalLoginErr').modal()
-                }
-            },
-            error: (xhr,err)=>{
-                console.log(xhr)
-                console.log(err)
+        API.login({ username, password })
+          .done((data) => {
+            if (data.code === 200) {
+              sessionStorage.setItem("user", JSON.stringify(data.user));
+              window.location.href = "room.html";
+            } else {
+              showErrorModal(data.msg);
             }
-        })
-    })
-</script>
-
-<!-- 弹出式对话框：表示登录失败 -->
-<div id="modalLoginErr" class="modal fade">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">登录失败</h4>
-            </div>
-            <div class="modal-body">
-                <p><b>登录失败！</b></p>
-                <p>服务器返回错误消息：<span id="serverErrMsg"></span></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-</body>
+          })
+          .fail(handleAjaxError);
+      });
+    </script>
+  </body>
 </html>
